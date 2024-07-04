@@ -7,36 +7,47 @@
 </head>
 <body>
     <h1>Weather Dashboard</h1>
-    <form action="/weather" method="POST">
+    <form id="weather-form">
         <label for="city">Enter City Name:</label>
         <input type="text" id="city" name="city" required>
         <button type="submit">Get Weather</button>
     </form>
     <div id="weather-result"></div>
     <script>
-        document.querySelector('form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const city = document.querySelector('#city').value;
-            const response = await fetch('/weather', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `city=${city}`
-            });
-            const data = await response.json();
-            const weatherResult = document.querySelector('#weather-result');
-            if (data.error) {
+        document.getElementById('weather-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const city = document.getElementById('city').value;
+            
+            try {
+                const response = await fetch('/weather', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', // Use JSON for POST data
+                    },
+                    body: JSON.stringify({ city }) // Send city as JSON
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                const weatherResult = document.getElementById('weather-result');
+
+                if (data.error) {
+                    weatherResult.textContent = 'Error fetching weather data';
+                } else {
+                    weatherResult.innerHTML = `
+                        <h2>Weather in ${data.location.name}, ${data.location.country}</h2>
+                        <p>Temperature: ${data.current.temp_c}°C</p>
+                        <p>Condition: ${data.current.condition.text}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
                 weatherResult.textContent = 'Error fetching weather data';
-            } else {
-                weatherResult.innerHTML = `
-                    <h2>Weather in ${data.location.name}, ${data.location.country}</h2>
-                    <p>Temperature: ${data.current.temp_c}°C</p>
-                    <p>Condition: ${data.current.condition.text}</p>
-                `;
             }
         });
     </script>
 </body>
 </html>
-
