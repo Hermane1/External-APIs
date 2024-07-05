@@ -7,6 +7,7 @@ const port = 3000;
 
 // Middleware to serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
