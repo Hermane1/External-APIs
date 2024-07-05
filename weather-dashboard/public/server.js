@@ -1,31 +1,18 @@
+// server.js
 const express = require('express');
-const bodyParser = require('body-parser');
-
+const path = require('path');
 const app = express();
-const port = 3000; // Choose your desired port number
 
-// Middleware to parse JSON bodies
-app.use(bodyParser.json());
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// POST route to handle weather data request
-app.post('/weather', (req, res) => {
-    const { city } = req.body;
-
-    // Replace with your logic to fetch weather data based on the city
-    // Example response (for demonstration purposes):
-    const weatherData = {
-        city: city,
-        temperature: '25°C',
-        description: 'Sunny'
-    };
-
-    // Simulate some delay for demonstration purposes
-    setTimeout(() => {
-        res.json(weatherData); // Respond with JSON data
-    }, 1000); // Simulating delay of 1 second
+// Define a route for the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
