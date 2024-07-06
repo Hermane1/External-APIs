@@ -4,54 +4,81 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My App</title>
+  <script type="text/javascript" src="/___vscode_livepreview_injected_script"></script>
 </head>
 <body>
   <h1>Welcome to My App!</h1>
-</body>
-</html>
-    <h1>Weather Dashboard</h1>
-    <form id="weather-form">
-        <label for="city">Enter City Name:</label>
-        <input type="text" id="city" name="city" required>
-        <button type="submit">Get Weather</button>
-    </form>
-    <div id="weather-result"></div>
 
-    <script>
-        document.getElementById('weather-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const city = document.getElementById('city').value;
+  <h1>Weather Dashboard</h1>
+  <form id="weather-form">
+    <label for="lat">Enter Latitude:</label>
+    <input type="text" id="lat" name="lat" required>
+    <label for="lon">Enter Longitude:</label>
+    <input type="text" id="lon" name="lon" required>
+    <button type="submit">Get Weather</button>
+  </form>
+  <div id="weather-result"></div>
 
-            try {
-                const response = await fetch('/weather', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ city })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const data = await response.json();
-                console.log(data); // For debugging, you can change this to update UI
-
-                // Update the UI with weather information
-                const weatherResult = document.getElementById('weather-result');
-                weatherResult.innerHTML = `
-                    <h2>Weather in ${city}</h2>
-                    <p>Temperature: ${data.temperature}°C</p>
-                    <p>Description: ${data.description}</p>
-                `;
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error);
-                // Optionally update UI to show error message
-                const weatherResult = document.getElementById('weather-result');
-                weatherResult.innerHTML = `<p>Failed to fetch weather data. Please try again.</p>`;
-            }
+  <script>
+    document.getElementById('weather-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const lat = document.getElementById('lat').value;
+      const lon = document.getElementById('lon').value;
+      const bodyJson = {
+        "lat": lat,
+        "lon": lon
+      }
+      try {
+        const response = await fetch('http://127.0.0.1:3000/weather', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(bodyJson)
         });
-    </script>
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log(JSON.stringify(data));
+
+        // Update the UI with weather information
+        const weatherResult = document.getElementById('weather-result');
+        weatherResult.innerHTML = `
+          <h2>Weather at ${lat},${lon}</h2>
+          <p>Temperature: ${data.temp}°C</p>
+          <p>Description: ${data.weather[0].description}</p>
+        `;
+      } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        const weatherResult = document.getElementById('weather-result');
+        weatherResult.innerHTML = `<p>Failed to fetch weather data. Please try again.</p>`;
+      }
+    });
+
+    async function fetchWeatherData() {
+      try {
+        const response = await fetch('https://api.example.com/weather');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const weatherResult = document.getElementById('weather-result');
+        weatherResult.innerHTML = `
+          <p>Temperature: ${data.temperature}°C</p>
+          <p>Condition: ${data.condition}</p>
+        `;
+      } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        const weatherResult = document.getElementById('weather-result');
+        weatherResult.innerHTML = `<p>Failed to fetch weather data. Please try again.</p>`;
+      }
+    }
+
+    
+    fetchWeatherData();
+  </script>
 </body>
 </html>
